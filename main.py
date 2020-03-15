@@ -11,7 +11,7 @@ config = configparser.ConfigParser()
 config.read(os.path.join(os.path.dirname(__file__), 'settings.ini'))
 urllib3.disable_warnings()
 
-COUNTRY = "Spain" # Change this!
+COUNTRY = "spain" # Change this!
 
 def tg_send(message):
     URL = "https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}".format(
@@ -38,10 +38,9 @@ def tg_delete(message_id):
         print("Something went wrong: \n {}".format(ex))
 
 def get_data():
-    r = requests.get("https://www.worldometers.info/coronavirus/")#.format(COUNTRY))
+    r = requests.get("https://www.worldometers.info/coronavirus/")
     soup = BeautifulSoup(r.text, 'html.parser')
 
-    #covid_raw = soup.select("#main_table_countries > tbody:nth-child(2)")
     rows = soup.find_all('tr')
 
     parsed_data = []
