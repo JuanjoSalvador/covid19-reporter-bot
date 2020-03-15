@@ -10,8 +10,10 @@ config = configparser.ConfigParser()
 config.read(os.path.join(os.path.dirname(__file__), 'settings.ini'))
 http = urllib3.PoolManager()
 
+COUNTRY = "Spain" # Change this!
+
 # Get the data
-r = http.request('GET', "https://www.worldometers.info/coronavirus/country/spain/")
+r = http.request('GET', "https://www.worldometers.info/coronavirus/country/{}}/".format(COUNTRY))
 soup = BeautifulSoup(r.text, 'html.parser')
 
 covid_raw = soup.select("div.maincounter-number > span")
