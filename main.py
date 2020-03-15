@@ -1,4 +1,5 @@
 import configparser
+import requests
 import urllib3
 import os
 from datetime import datetime as dt
@@ -10,19 +11,21 @@ config = configparser.ConfigParser()
 config.read(os.path.join(os.path.dirname(__file__), 'settings.ini'))
 http = urllib3.PoolManager()
 
+urllib3.disable_warnings()
+
 COUNTRY = "Spain" # Change this!
 
 # Get the data
-r = http.request('GET', "https://www.worldometers.info/coronavirus/country/{}}/".format(COUNTRY))
+r = requests.get("https://www.worldometers.info/coronavirus/country/{}/".format(COUNTRY))
 soup = BeautifulSoup(r.text, 'html.parser')
 
 covid_raw = soup.select("div.maincounter-number > span")
 
 message = "Reporte del {} \n \
-            {}casos confirmados en España.\n \
-            {} recuperados.\n \
-            {} muertos.".format(dt.now().strftime("%d/%m/%Y a las %H:%M:%S"),
-            covid_raw[0].text, covid_raw[2].text, covid_raw[1].text)
+{}casos confirmados en España.\n \
+{} recuperados.\n \
+{} muertos.".format(dt.now().strftime("%d/%m/%Y a las %H:%M:%S"),
+                    covid_raw[0].text, covid_raw[2].text, covid_raw[1].text)
 
 if config['DEFAULT'].getboolean('MASTODON_ENABLED'):
     # Mastodon config
@@ -40,6 +43,6 @@ if config['DEFAULT'].getboolean('TELEGRAM_ENABLED'):
         message)
 
     try:
-        http.request('GET', URL)
+        requests.get(URL)
     except Exception as ex:
         print("Something went wrong: \n {}".format(ex))
