@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from mastodon import Mastodon
 
 mastodon = Mastodon(
-            access_token = 'AN82Wr_dS1CNjg8Ldc522cDWkCOwLJQsR92UImjIEao',
+            access_token = 'YOUR API KEY HERE',
             api_base_url = 'https://hispatodon.club/'
         )
 
