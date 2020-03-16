@@ -60,7 +60,11 @@ def get_data():
                 if col.text.strip() == COUNTRY.capitalize():
                     country_data = row.find_all('td')
                     for c_data in country_data:
-                        parsed_data.append(c_data.text.strip().replace("+", ""))
+                        n = c_data.text.strip()
+                        n = n.replace("+", "")
+                        n = n.replace(",", "")
+
+                        parsed_data.append(n)
     
     return parsed_data
 
@@ -69,15 +73,23 @@ def main():
     try:
         covid_data = get_data()
 
+        dead_percent = "%.2f" % (float(covid_data[3])/float(covid_data[1]) * 100)
+        heal_percent = "%.2f" % (float(covid_data[5])/float(covid_data[1]) * 100)
+
         message = "Informe del {} \n\n\
-        * {} casos confirmados en España ({} hoy).\n\
-        * {} recuperados.\n\
-        * {} muertos ({} hoy).\n\n\
-        Recuerda, es importante quedarse en casa, lavarse las manos \
-        con regularidad y en caso de síntomas, acudir al teléfono \
-        habilitado por las autoridades sanitarias de tu comunidad.".format(
-                dt.now().strftime("%d/%m/%Y a las %H:%M:%S"),
-                covid_data[1], covid_data[2], covid_data[5], covid_data[3], covid_data[4])
+* {} casos confirmados en España ({} hoy).\n\
+* {} recuperados.\n\
+* {} muertos ({} hoy).\n\n\
+La tasa de mortalidad es un {}%\n\
+La tasa de recuperación es un {}%\n\n\
+Recuerda, es importante quedarse en casa, lavarse las manos \
+con regularidad y en caso de síntomas, acudir al teléfono \
+habilitado por las autoridades sanitarias de tu comunidad.".format(
+        dt.now().strftime("%d/%m/%Y a las %H:%M:%S"),
+        covid_data[1], covid_data[2], 
+        covid_data[5],
+        covid_data[3], covid_data[4],
+        dead_percent, heal_percent)
 
         if config['DEFAULT'].getboolean('MASTODON_ENABLED'):
             # Mastodon config
