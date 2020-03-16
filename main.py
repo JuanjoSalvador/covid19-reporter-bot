@@ -50,7 +50,7 @@ def get_data():
         date = dt.now().strftime("%d/%m/%Y %H:%M:%S")
         log_file.write(f"[{date}] - Error while retrieving data: {ex}\n")
 
-    if r.status_code == 300:
+    if r.status_code == 200:
         soup = BeautifulSoup(r.text, 'html.parser')
         rows = soup.find_all('tr')
 
