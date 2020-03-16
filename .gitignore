@@ -1,3 +1,4 @@
 env
 linux-env
 settings.ini
+*.log
