@@ -13,16 +13,16 @@ config.read(os.path.join(os.path.dirname(__file__), 'settings.ini'))
 
 COUNTRY = "spain" # Change this!
 
-log_file = open('error.log', 'a+')
+log_file = open(os.path.join(os.path.dirname(__file__), 'error.log'), 'a+')
 
 def tg_send(message):
-    URL = "https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}".format(
+    url = "https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}".format(
         config['TELEGRAM']['API_KEY'], 
         config['TELEGRAM']['CHANNEL_NAME'], 
         message)
 
     try:
-        r = requests.get(URL)
+        r = requests.get(url)
     except Exception as ex:
         date = dt.now().strftime("%d/%m/%Y %H:%M:%S")
         log_file.write(f"[{date}] - Error while sending last message: {ex}\n")
@@ -73,23 +73,18 @@ def main():
     try:
         covid_data = get_data()
 
-        dead_percent = "%.2f" % (float(covid_data[3])/float(covid_data[1]) * 100)
-        heal_percent = "%.2f" % (float(covid_data[5])/float(covid_data[1]) * 100)
+        dead_percent = "%.2f" % (float(covid_data[4])/float(covid_data[2]) * 100)
 
         message = "Informe del {} \n\n\
-* {} casos confirmados en España ({} hoy).\n\
-* {} recuperados.\n\
-* {} muertos ({} hoy).\n\n\
+* {} casos confirmados en España ({} casos reportados hoy).\n\
+* {} muertos ({} muertes reportadas hoy).\n\n\
 La tasa de mortalidad es un {}%\n\
-La tasa de recuperación es un {}%\n\n\
 Recuerda, es importante quedarse en casa, lavarse las manos \
 con regularidad y en caso de síntomas, acudir al teléfono \
 habilitado por las autoridades sanitarias de tu comunidad.".format(
         dt.now().strftime("%d/%m/%Y a las %H:%M:%S"),
-        covid_data[1], covid_data[2], 
-        covid_data[5],
-        covid_data[3], covid_data[4],
-        dead_percent, heal_percent)
+        covid_data[2], covid_data[3] if covid_data[3] else "sin", 
+        covid_data[4], covid_data[5] if covid_data[5] else "sin", dead_percent)
 
         if config['DEFAULT'].getboolean('MASTODON_ENABLED'):
             # Mastodon config
@@ -105,7 +100,6 @@ habilitado por las autoridades sanitarias de tu comunidad.".format(
             
             if response['ok']:
                 if config['TELEGRAM'].getboolean('DELETE_LAST_MESSAGE'):
-                    print("YEAH!")
                     try:
                         message_log = open('message_id.log')
                         last_message = message_log.read()
